@@ -34,8 +34,6 @@ module OmniAuth
         options.authorize_params.prompt = request.params['prompt'] if request.params['prompt']
         options.client_options.authorize_url = "#{options.base_azure_url}/#{options.tenant_id}/oauth2/authorize"
         options.client_options.token_url = "#{options.base_azure_url}/#{options.tenant_id}/oauth2/token"
-
-        options.token_params.resource = options.resource
         super
       end
 
@@ -53,6 +51,11 @@ module OmniAuth
           oid: raw_info['oid'],
           tid: raw_info['tid']
         }
+      end
+      
+      def token_params
+        resource = request.env.dig('omniauth.params', 'azure_resource') || options.resource
+        super.merge(resource: resource)
       end
 
       def callback_url

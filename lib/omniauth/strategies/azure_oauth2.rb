@@ -54,8 +54,8 @@ module OmniAuth
       end
       
       def token_params
-        resource = request.env.dig('omniauth.params', 'azure_resource') || options.resource
-        super.merge(resource: resource)
+        azure_resource = request.env['omniauth.params'] && request.env['omniauth.params']['azure_resource']
+        super.merge(resource: azure_resource || options.resource)
       end
 
       def callback_url

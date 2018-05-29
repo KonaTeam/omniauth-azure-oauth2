@@ -46,26 +46,6 @@ describe OmniAuth::Strategies::AzureOauth2 do
         expect(subject.client.options[:token_url]).to eql('https://login.microsoftonline.com/tenant/oauth2/token')
       end
 
-      context 'when token params' do
-        before do
-          allow(subject).to receive(:request) { request }
-          subject.client
-        end
-
-        it 'has default resource' do
-          expect(subject.token_params[:resource]).to eq '00000002-0000-0000-c000-000000000000'
-        end
-
-        context 'when custom crm url' do
-          let(:crm_url) { 'https//mydomain.crm.dynamics.com/' }
-
-          it 'has resource from url params' do
-            request.env['omniauth.params'] = { 'azure_resource' => crm_url }
-            expect(subject.token_params[:resource]).to eq crm_url
-          end
-        end
-      end
-
       describe "overrides" do
         it 'should override domain_hint' do
           @options = {domain_hint: 'hint'}
@@ -319,6 +299,30 @@ describe OmniAuth::Strategies::AzureOauth2 do
       expect do
         subject.info
       end.to_not raise_error
+    end
+  end
+
+  describe 'token_params' do
+    let(:strategy) { OmniAuth::Strategies::AzureOauth2.new(app, client_id: 'id', client_secret: 'secret') }
+    let(:request)  { double('Request', env: env) }
+    let(:env)      { {} }
+
+    subject { strategy.token_params }
+
+    before { allow(strategy).to receive(:request).and_return request }
+
+    it { is_expected.to be_a OmniAuth::Strategy::Options }
+    it 'has default resource' do
+      expect(subject.resource).to eq '00000002-0000-0000-c000-000000000000'
+    end
+
+    context 'when custom crm url' do
+      let(:crm_url) { 'https://mydomain.crm.dynamics.com/' }
+      let(:env)     { { 'omniauth.params' => { 'azure_resource' => crm_url } } }
+
+      it 'has resource from url params' do
+        expect(subject.resource).to eq crm_url
+      end
     end
   end
 end

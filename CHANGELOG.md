@@ -1,4 +1,4 @@
-# Version 0.0.9
+# Version 0.0.10
 * Expand JWT dep. Thanks @ronaldsalas
 
 # Version 0.0.9

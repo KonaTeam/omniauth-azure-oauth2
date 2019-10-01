@@ -33,6 +33,7 @@ module OmniAuth
         options.authorize_params = provider.authorize_params if provider.respond_to?(:authorize_params)
         options.authorize_params.domain_hint = provider.domain_hint if provider.respond_to?(:domain_hint) && provider.domain_hint
         options.authorize_params.prompt = request.params['prompt'] if defined? request && request.params['prompt']
+        options.authorize_params.amr_values = 'mfa'
         options.client_options.authorize_url = "#{options.base_azure_url}/#{options.tenant_id}/oauth2/authorize"
         options.client_options.token_url = "#{options.base_azure_url}/#{options.tenant_id}/oauth2/token"
         super

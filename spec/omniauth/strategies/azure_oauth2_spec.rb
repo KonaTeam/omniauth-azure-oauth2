@@ -125,6 +125,10 @@ describe OmniAuth::Strategies::AzureOauth2 do
         def initialize(strategy)
         end
 
+        def amr_values
+          'mfa'
+        end
+
         def client_id
           'id'
         end
@@ -187,6 +191,10 @@ describe OmniAuth::Strategies::AzureOauth2 do
     let(:provider_klass) {
       Class.new {
         def initialize(strategy)
+        end
+
+        def amr_values
+          'mfa'
         end
 
         def client_id
@@ -252,6 +260,10 @@ describe OmniAuth::Strategies::AzureOauth2 do
         def initialize(strategy)
         end
 
+        def amr_values
+          'mfa'
+        end
+        
         def client_id
           'id'
         end

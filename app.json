@@ -1,0 +1,74 @@
+{
+  "addons": [
+    "heroku-postgresql"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/ruby"
+    }
+  ],
+  "description": "",
+  "env": {
+    "ARCHIVE_DATABASE_URL": {
+      "required": true
+    },
+    "BRAND_ANALYTICS_URL": {
+      "required": true
+    },
+    "GEM_PATH": {
+      "required": true
+    },
+    "HEROKU_POSTGRESQL_GREEN_URL": {
+      "required": true
+    },
+    "KAFKA_URL": {
+      "required": true
+    },
+    "LANG": {
+      "required": true
+    },
+    "PASSWORD": {
+      "required": true
+    },
+    "PATH": {
+      "required": true
+    },
+    "RACK_ENV": {
+      "required": true
+    },
+    "RAILS_ENV": {
+      "required": true
+    },
+    "REDIS_URL": {
+      "required": true
+    },
+    "STATSD_URL": {
+      "required": true
+    },
+    "USERNAME": {
+      "required": true
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "Standard-1X"
+    },
+    "scheduler": {
+      "quantity": 1,
+      "size": "Standard-1X"
+    },
+    "web": {
+      "quantity": 1,
+      "size": "Standard-1X"
+    },
+    "consumer": {
+      "quantity": 1,
+      "size": "Standard-1X"
+    }
+  },
+  "name": "omniauth-azure-oauth2",
+  "scripts": {
+  },
+  "stack": "heroku-16"
+}

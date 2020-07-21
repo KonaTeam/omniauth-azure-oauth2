@@ -13,7 +13,10 @@ module OmniAuth
       # AD resource identifier
       option :resource, '00000002-0000-0000-c000-000000000000'
 
-      # tenant_provider must return client_id, client_secret and optionally tenant_id and base_azure_url
+      # AD default scope
+      option :scope, 'User.Read'
+
+      # tenant_provider must return client_id, client_secret and optionally tenant_id, base_azure_url, v2, and scope
       args [:tenant_provider]
 
       def client
@@ -29,17 +32,19 @@ module OmniAuth
           provider.respond_to?(:tenant_id) ? provider.tenant_id : 'common'
         options.base_azure_url =
           provider.respond_to?(:base_azure_url) ? provider.base_azure_url : BASE_AZURE_URL
+        options.v2 = provider.respond_to?(:v2) && provider.v2 ? '/v2.0' : ''
+        options.uid_claim = provider.respond_to?(:uid_claim) ? provider.uid_claim : 'sub'
 
         options.authorize_params = provider.authorize_params if provider.respond_to?(:authorize_params)
         options.authorize_params.domain_hint = provider.domain_hint if provider.respond_to?(:domain_hint) && provider.domain_hint
         options.authorize_params.prompt = request.params['prompt'] if defined? request && request.params['prompt']
-        options.client_options.authorize_url = "#{options.base_azure_url}/#{options.tenant_id}/oauth2/authorize"
-        options.client_options.token_url = "#{options.base_azure_url}/#{options.tenant_id}/oauth2/token"
+        options.client_options.authorize_url = "#{options.base_azure_url}/#{options.tenant_id}/oauth2#{options.v2}/authorize"
+        options.client_options.token_url = "#{options.base_azure_url}/#{options.tenant_id}/oauth2#{options.v2}/token"
         super
       end
 
       uid {
-        raw_info['sub']
+        raw_info[options.uid_claim]
       }
 
       info do
@@ -55,8 +60,13 @@ module OmniAuth
       end
 
       def token_params
-        azure_resource = request.env['omniauth.params'] && request.env['omniauth.params']['azure_resource']
-        super.merge(resource: azure_resource || options.resource)
+        if options.v2 == '/v2.0'
+          azure_scope = request.env['omniauth.params'] && request.env['omniauth.params']['azure_scope']
+          super.merge(scope: azure_scope || options.scope)
+        else
+          azure_resource = request.env['omniauth.params'] && request.env['omniauth.params']['azure_resource']
+          super.merge(resource: azure_resource || options.resource)
+        end
       end
 
       def callback_url

@@ -119,6 +119,83 @@ describe OmniAuth::Strategies::AzureOauth2 do
     end
   end
 
+  describe 'static common configuration v2' do
+    let(:options) { @options || {} }
+    subject do
+      OmniAuth::Strategies::AzureOauth2.new(app, {client_id: 'id', client_secret: 'secret', v2: true}.merge(options))
+    end
+
+    before do
+      allow(subject).to receive(:request) { request }
+    end
+
+    describe '#client' do
+      it 'has correct authorize url' do
+        expect(subject.client.options[:authorize_url]).to eql('https://login.microsoftonline.com/common/oauth2/v2.0/authorize')
+      end
+
+      it 'has correct token url' do
+        expect(subject.client.options[:token_url]).to eql('https://login.microsoftonline.com/common/oauth2/v2.0/token')
+      end
+
+      it 'has correct authorize params' do
+        subject.client
+        expect(subject.authorize_params[:scope]).to eql('User.Read')
+        expect(subject.authorize_params[:resource]).to be_nil
+      end
+
+      it 'has correct token params' do
+        subject.client
+        expect(subject.token_params[:scope]).to eql('User.Read')
+        expect(subject.token_params[:resource]).to be_nil
+      end
+
+      it 'has correct uid claim' do
+        subject.client
+        expect(subject.options[:uid_claim]).to eql('sub')
+      end
+    end
+  end
+
+  describe 'static custom configuration v2' do
+    let(:options) { @options || {} }
+    subject do
+      OmniAuth::Strategies::AzureOauth2.new(app, {client_id: 'id', client_secret: 'secret', v2: true, uid_claim: 'oid'}.merge(options))
+    end
+
+    before do
+      allow(subject).to receive(:request) { request }
+    end
+
+    describe '#client' do
+      it 'has correct authorize url' do
+        expect(subject.client.options[:authorize_url]).to eql('https://login.microsoftonline.com/common/oauth2/v2.0/authorize')
+      end
+
+      it 'has correct token url' do
+        expect(subject.client.options[:token_url]).to eql('https://login.microsoftonline.com/common/oauth2/v2.0/token')
+      end
+
+      it 'has correct authorize params' do
+        subject.client
+        puts subject.authorize_params
+        expect(subject.authorize_params[:scope]).to eql('User.Read')
+        expect(subject.authorize_params[:resource]).to be_nil
+      end
+
+      it 'has correct token params' do
+        subject.client
+        expect(subject.token_params[:scope]).to eql('User.Read')
+        expect(subject.token_params[:resource]).to be_nil
+      end
+
+      it 'has correct uid claim' do
+        subject.client
+        expect(subject.options[:uid_claim]).to eql('oid')
+      end
+    end
+  end
+
   describe 'dynamic configuration' do
     let(:provider_klass) {
       Class.new {
@@ -277,6 +354,123 @@ describe OmniAuth::Strategies::AzureOauth2 do
 
       it 'has correct token url' do
         expect(subject.client.options[:token_url]).to eql('https://login.microsoftonline.com/common/oauth2/token')
+      end
+    end
+  end
+
+  describe 'dynamic common configuration v2' do
+    let(:provider_klass) {
+      Class.new {
+        def initialize(strategy)
+        end
+
+        def client_id
+          'id'
+        end
+
+        def client_secret
+          'secret'
+        end
+
+        def v2
+          true
+        end
+      }
+    }
+
+    subject do
+      OmniAuth::Strategies::AzureOauth2.new(app, provider_klass)
+    end
+
+    before do
+      allow(subject).to receive(:request) { request }
+    end
+
+    describe '#client' do
+      it 'has correct authorize url' do
+        expect(subject.client.options[:authorize_url]).to eql('https://login.microsoftonline.com/common/oauth2/v2.0/authorize')
+      end
+
+      it 'has correct token url' do
+        expect(subject.client.options[:token_url]).to eql('https://login.microsoftonline.com/common/oauth2/v2.0/token')
+      end
+
+      it 'has correct authorize params' do
+        subject.client
+        expect(subject.authorize_params[:scope]).to eql('User.Read')
+        expect(subject.authorize_params[:resource]).to be_nil
+      end
+
+      it 'has correct token params' do
+        subject.client
+        expect(subject.token_params[:scope]).to eql('User.Read')
+        expect(subject.token_params[:resource]).to be_nil
+      end
+
+      it 'has correct uid claim' do
+        subject.client
+        expect(subject.options[:uid_claim]).to eql('sub')
+      end
+    end
+  end
+
+  describe 'dynamic custom configuration v2' do
+    let(:provider_klass) {
+      Class.new {
+        def initialize(strategy)
+        end
+
+        def client_id
+          'id'
+        end
+
+        def client_secret
+          'secret'
+        end
+
+        def v2
+          true
+        end
+
+        def uid_claim
+          'oid'
+        end
+      }
+    }
+
+    subject do
+      OmniAuth::Strategies::AzureOauth2.new(app, provider_klass)
+    end
+
+    before do
+      allow(subject).to receive(:request) { request }
+    end
+
+    describe '#client' do
+      it 'has correct authorize url' do
+        expect(subject.client.options[:authorize_url]).to eql('https://login.microsoftonline.com/common/oauth2/v2.0/authorize')
+      end
+
+      it 'has correct token url' do
+        expect(subject.client.options[:token_url]).to eql('https://login.microsoftonline.com/common/oauth2/v2.0/token')
+      end
+
+      it 'has correct authorize params' do
+        subject.client
+        puts subject.authorize_params
+        expect(subject.authorize_params[:scope]).to eql('User.Read')
+        expect(subject.authorize_params[:resource]).to be_nil
+      end
+
+      it 'has correct token params' do
+        subject.client
+        expect(subject.token_params[:scope]).to eql('User.Read')
+        expect(subject.token_params[:resource]).to be_nil
+      end
+
+      it 'has correct uid claim' do
+        subject.client
+        expect(subject.options[:uid_claim]).to eql('oid')
       end
     end
   end

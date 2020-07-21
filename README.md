@@ -138,6 +138,25 @@ use OmniAuth::Builder do
 end
 ```
 
+## Azure v2 Endpoints
+
+The Azure `v1` endpoints are used by default. To use the `v2` endpoints set the `v2` option to `true`. Ex:
+
+```ruby
+use OmniAuth::Builder do
+  provider :azure_oauth2,
+    {
+      client_id: ENV['AZURE_CLIENT_ID'],
+      client_secret: ENV['AZURE_CLIENT_SECRET'],
+      tenant_id: ENV['AZURE_TENANT_ID'],
+      v2: true
+    }
+end
+```
+
+A scope must be set for the `v2` endpoints to work properly. The default scope is `User.Read`, which is automatically set.
+To use different scopes, set the scope option in the config. It currently isn't designed to be dynamic.
+
 ## Contributing
 
 1. Fork it
